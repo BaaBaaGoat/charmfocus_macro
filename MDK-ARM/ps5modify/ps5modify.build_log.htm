@@ -1,0 +1,81 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: ¦ÌVision V5.14.0.0
+Copyright (C) 2015 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: sda Administrator, sad, LIC=32B1Q-NA09N-636MB-2S9IM-VQY66-2Q0QC
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Standard  Version: 5.14.0.0
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.05 update 1 (build 106)
+Assembler:       Armasm.exe V5.05 update 1 (build 106)
+Linker/Locator:  ArmLink.exe V5.05 update 1 (build 106)
+Library Manager: ArmAr.exe V5.05 update 1 (build 106)
+Hex Converter:   FromElf.exe V5.05 update 1 (build 106)
+CPU DLL:         SARMCM3.DLL V5.14.0.0
+Dialog DLL:      DCM.DLL V1.13.1.0
+Target DLL:      CMSIS_AGDI.dll V1.21.0.0
+Dialog DLL:      TCM.DLL V1.14.4.0
+ 
+<h2>Project:</h2>
+C:\Users\Administrator\Desktop\ps5modify\MDK-ARM\ps5modify.uvprojx
+Project File Date:  06/29/2023
+
+<h2>Output:</h2>
+Build target 'ps5modify'
+compiling main.c...
+../Core/Src/main.c(186): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(GPIO_GAMEPAD_TOUCH_GPIO_Port,GPIO_GAMEPAD_TOUCH_Pin,(KeyCode & SCANCODE_TOUCH)?0:1);
+../Core/Src/main.c(187): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(GPIO_GAMEPAD_R1_GPIO_Port,GPIO_GAMEPAD_R1_Pin,(KeyCode & SCANCODE_R1)?0:1);
+../Core/Src/main.c(188): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(GPIO_GAMEPAD_UP_GPIO_Port,GPIO_GAMEPAD_UP_Pin,(KeyCode & SCANCODE_UP)?0:1);
+../Core/Src/main.c(189): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(GPIO_GAMEPAD_LEFT_GPIO_Port,GPIO_GAMEPAD_LEFT_Pin,(KeyCode & SCANCODE_LEFT)?0:1);
+../Core/Src/main.c(190): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(GPIO_GAMEPAD_DOWN_GPIO_Port,GPIO_GAMEPAD_DOWN_Pin,(KeyCode & SCANCODE_DOWN)?0:1);
+../Core/Src/main.c(191): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(GPIO_GAMEPAD_RIGHT_GPIO_Port,GPIO_GAMEPAD_RIGHT_Pin,(KeyCode & SCANCODE_RIGHT)?0:1);
+../Core/Src/main.c(192): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(GPIO_GAMEPAD_TRIANGLE_GPIO_Port,GPIO_GAMEPAD_TRIANGLE_Pin,(KeyCode & SCANCODE_TRIANGLE)?0:1);
+../Core/Src/main.c(193): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(GPIO_GAMEPAD_SQUARE_GPIO_Port,GPIO_GAMEPAD_SQUARE_Pin,(KeyCode & SCANCODE_SQUARE)?0:1);
+../Core/Src/main.c(194): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(GPIO_GAMEPAD_X_GPIO_Port,GPIO_GAMEPAD_X_Pin,(KeyCode & SCANCODE_X)?0:1);
+../Core/Src/main.c(195): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(GPIO_GAMEPAD_CIRCLE_GPIO_Port,GPIO_GAMEPAD_CIRCLE_Pin,(KeyCode & SCANCODE_CIRCLE)?0:1);
+../Core/Src/main.c(196): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(GPIO_GAMEPAD_L1_GPIO_Port,GPIO_GAMEPAD_L1_Pin,(KeyCode & SCANCODE_L1)?0:1);
+../Core/Src/main.c(239): warning:  #177-D: variable "DEBUGDATA" was declared but never referenced
+   static uint8_t DEBUGDATA[200];
+../Core/Src/main.c(250): warning:  #550-D: variable "A" was set but never used
+   uint16_t PC,A,B;
+../Core/Src/main.c: 13 warnings, 0 errors
+linking...
+Program Size: Code=19460 RO-data=3400 RW-data=408 ZI-data=6200  
+FromELF: creating hex file...
+"ps5modify\ps5modify.axf" - 0 Error(s), 13 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.4.2.0.pack
+                ARM::CMSIS:CORE:3.40.0
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: CORE Version: 3.40.0
+
+<h2>Collection of Component include folders:</h2>
+  C:\Users\Administrator\Desktop\ps5modify\MDK-ARM\RTE
+  C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include
+  C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.4.1
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:3.40.0
+      Source file:   CMSIS\UserCodeTemplates\ARM\ITM_Retarget.c
+</pre>
+</body>
+</html>
