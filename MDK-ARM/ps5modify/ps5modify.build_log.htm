@@ -22,42 +22,50 @@ Dialog DLL:      TCM.DLL V1.14.4.0
  
 <h2>Project:</h2>
 C:\Users\Administrator\Desktop\ps5modify\MDK-ARM\ps5modify.uvprojx
-Project File Date:  06/29/2023
+Project File Date:  07/03/2023
 
 <h2>Output:</h2>
 Build target 'ps5modify'
 compiling main.c...
-../Core/Src/main.c(186): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(199): warning:  #188-D: enumerated type mixed with another type
         HAL_GPIO_WritePin(GPIO_GAMEPAD_TOUCH_GPIO_Port,GPIO_GAMEPAD_TOUCH_Pin,(KeyCode & SCANCODE_TOUCH)?0:1);
-../Core/Src/main.c(187): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(200): warning:  #188-D: enumerated type mixed with another type
         HAL_GPIO_WritePin(GPIO_GAMEPAD_R1_GPIO_Port,GPIO_GAMEPAD_R1_Pin,(KeyCode & SCANCODE_R1)?0:1);
-../Core/Src/main.c(188): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(201): warning:  #188-D: enumerated type mixed with another type
         HAL_GPIO_WritePin(GPIO_GAMEPAD_UP_GPIO_Port,GPIO_GAMEPAD_UP_Pin,(KeyCode & SCANCODE_UP)?0:1);
-../Core/Src/main.c(189): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(202): warning:  #188-D: enumerated type mixed with another type
         HAL_GPIO_WritePin(GPIO_GAMEPAD_LEFT_GPIO_Port,GPIO_GAMEPAD_LEFT_Pin,(KeyCode & SCANCODE_LEFT)?0:1);
-../Core/Src/main.c(190): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(203): warning:  #188-D: enumerated type mixed with another type
         HAL_GPIO_WritePin(GPIO_GAMEPAD_DOWN_GPIO_Port,GPIO_GAMEPAD_DOWN_Pin,(KeyCode & SCANCODE_DOWN)?0:1);
-../Core/Src/main.c(191): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(204): warning:  #188-D: enumerated type mixed with another type
         HAL_GPIO_WritePin(GPIO_GAMEPAD_RIGHT_GPIO_Port,GPIO_GAMEPAD_RIGHT_Pin,(KeyCode & SCANCODE_RIGHT)?0:1);
-../Core/Src/main.c(192): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(205): warning:  #188-D: enumerated type mixed with another type
         HAL_GPIO_WritePin(GPIO_GAMEPAD_TRIANGLE_GPIO_Port,GPIO_GAMEPAD_TRIANGLE_Pin,(KeyCode & SCANCODE_TRIANGLE)?0:1);
-../Core/Src/main.c(193): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(206): warning:  #188-D: enumerated type mixed with another type
         HAL_GPIO_WritePin(GPIO_GAMEPAD_SQUARE_GPIO_Port,GPIO_GAMEPAD_SQUARE_Pin,(KeyCode & SCANCODE_SQUARE)?0:1);
-../Core/Src/main.c(194): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(207): warning:  #188-D: enumerated type mixed with another type
         HAL_GPIO_WritePin(GPIO_GAMEPAD_X_GPIO_Port,GPIO_GAMEPAD_X_Pin,(KeyCode & SCANCODE_X)?0:1);
-../Core/Src/main.c(195): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(208): warning:  #188-D: enumerated type mixed with another type
         HAL_GPIO_WritePin(GPIO_GAMEPAD_CIRCLE_GPIO_Port,GPIO_GAMEPAD_CIRCLE_Pin,(KeyCode & SCANCODE_CIRCLE)?0:1);
-../Core/Src/main.c(196): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(209): warning:  #188-D: enumerated type mixed with another type
         HAL_GPIO_WritePin(GPIO_GAMEPAD_L1_GPIO_Port,GPIO_GAMEPAD_L1_Pin,(KeyCode & SCANCODE_L1)?0:1);
-../Core/Src/main.c(239): warning:  #177-D: variable "DEBUGDATA" was declared but never referenced
+../Core/Src/main.c(210): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(ANALOG_GAMEPAD_L2_GPIO_Port,ANALOG_GAMEPAD_L2_Pin,(KeyCode & SCANCODE_L2)?0:1);
+../Core/Src/main.c(211): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(ANALOG_GAMEPAD_R2_GPIO_Port,ANALOG_GAMEPAD_R2_Pin,(KeyCode & SCANCODE_R2)?0:1);
+../Core/Src/main.c(257): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(ANALOG_GAMEPAD_R2_GPIO_Port,ANALOG_GAMEPAD_R2_Pin,1);
+../Core/Src/main.c(258): warning:  #188-D: enumerated type mixed with another type
+        HAL_GPIO_WritePin(ANALOG_GAMEPAD_R2_GPIO_Port,ANALOG_GAMEPAD_L2_Pin,1);
+../Core/Src/main.c(264): warning:  #177-D: variable "DEBUGDATA" was declared but never referenced
    static uint8_t DEBUGDATA[200];
-../Core/Src/main.c(250): warning:  #550-D: variable "A" was set but never used
+../Core/Src/main.c(275): warning:  #550-D: variable "A" was set but never used
    uint16_t PC,A,B;
-../Core/Src/main.c: 13 warnings, 0 errors
+../Core/Src/main.c: 17 warnings, 0 errors
 linking...
-Program Size: Code=19460 RO-data=3400 RW-data=408 ZI-data=6200  
+Program Size: Code=23240 RO-data=12632 RW-data=408 ZI-data=6512  
 FromELF: creating hex file...
-"ps5modify\ps5modify.axf" - 0 Error(s), 13 Warning(s).
+"ps5modify\ps5modify.axf" - 0 Error(s), 17 Warning(s).
 
 <h2>Software Packages used:</h2>
 

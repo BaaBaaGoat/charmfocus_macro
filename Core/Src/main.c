@@ -78,8 +78,8 @@ typedef __packed struct {
 #define SCANCODE_RIGHT 0x00000100
 #define SCANCODE_L1 0x00000200
 #define SCANCODE_R1 0x00000400
-//#define SCANCODE_L2 0x00000800
-//#define SCANCODE_R2 0x00001000
+#define SCANCODE_L2 0x00000800
+#define SCANCODE_R2 0x00001000
 //#define SCANCODE_L3 0x00002000
 //#define SCANCODE_R3 0x00004000
 // ±³¼ü Ö»¶Á
@@ -97,13 +97,15 @@ typedef __packed struct {
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
 
 /* USER CODE BEGIN PV */
 const struct{
 	Command_t prog_BACKKEY1[1024];
-//	Command_t prog_BACKKEY2[1024];
-//	Command_t prog_BACKKEY3[1024];
-//	Command_t prog_BACKKEY4[1024];
+	Command_t prog_BACKKEY2[1024];
+	Command_t prog_BACKKEY3[1024];
+	Command_t prog_BACKKEY4[1024];
 //	Command_t prog_BACKKEYLEFT[1024];
 //	Command_t prog_BACKKEYRIGHT[1024];
 } ProgramSet = {
@@ -116,15 +118,17 @@ const struct{
 		{OP_WAIT,38},
 		{OP_JUMP,5}
 	},
-//	.prog_BACKKEY2 = {
-//		{OP_JUMP,1}
-//	},
-//	.prog_BACKKEY3 = {
-//		{OP_JUMP,1}
-//	},
-//	.prog_BACKKEY4 = {
-//		{OP_JUMP,1}
-//	},
+	.prog_BACKKEY2 = {
+		{OP_PRESS,SCANCODE_R2},
+		{OP_JUMP,2}
+	},
+	.prog_BACKKEY3 = {
+		{OP_JUMP,1}
+	},
+	.prog_BACKKEY4 = {
+		{OP_PRESS,SCANCODE_L2},
+		{OP_JUMP,2}
+	},
 //	.prog_BACKKEYLEFT = {
 //		{OP_JUMP,1}
 //	},
@@ -140,6 +144,8 @@ uint32_t KeyStat,KeyPressed,KeyReleased;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
+static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -166,6 +172,12 @@ uint32_t ReadKeyStatus(){
 	if(!HAL_GPIO_ReadPin(BACKKEY4_GPIO_Port,BACKKEY4_Pin))            stat |=  SCANCODE_BACKKEY4;
 	if(!HAL_GPIO_ReadPin(BACKKEY_LEFT_GPIO_Port,BACKKEY_LEFT_Pin))    stat |=  SCANCODE_BACKKEYLEFT;
 	if(!HAL_GPIO_ReadPin(BACKKEY_RIGHT_GPIO_Port,BACKKEY_RIGHT_Pin))  stat |=  SCANCODE_BACKKEYRIGHT;
+	
+	uint16_t adcvalue[4];
+	HAL_ADC_Start_DMA(&hadc1, (void*)adcvalue, 4);
+	HAL_ADC_PollForConversion(&hadc1,10);
+	if(adcvalue[0] < 0x0200)  stat |=  SCANCODE_R2;
+	if(adcvalue[1] < 0x0200)  stat |=  SCANCODE_L2;
 	return stat;
 	
 }
@@ -195,6 +207,8 @@ void WriteKeyStat(uint32_t KeyCode){
 	HAL_GPIO_WritePin(GPIO_GAMEPAD_X_GPIO_Port,GPIO_GAMEPAD_X_Pin,(KeyCode & SCANCODE_X)?0:1);
 	HAL_GPIO_WritePin(GPIO_GAMEPAD_CIRCLE_GPIO_Port,GPIO_GAMEPAD_CIRCLE_Pin,(KeyCode & SCANCODE_CIRCLE)?0:1);
 	HAL_GPIO_WritePin(GPIO_GAMEPAD_L1_GPIO_Port,GPIO_GAMEPAD_L1_Pin,(KeyCode & SCANCODE_L1)?0:1);
+	HAL_GPIO_WritePin(ANALOG_GAMEPAD_L2_GPIO_Port,ANALOG_GAMEPAD_L2_Pin,(KeyCode & SCANCODE_L2)?0:1);
+	HAL_GPIO_WritePin(ANALOG_GAMEPAD_R2_GPIO_Port,ANALOG_GAMEPAD_R2_Pin,(KeyCode & SCANCODE_R2)?0:1);
 }
 const int FrameInterval = 10;// 10ms°´¼üÉ¨Ãè¼ä¸ô
 
@@ -231,8 +245,18 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USB_DEVICE_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+	GPIO_InitStruct.Pin = ANALOG_GAMEPAD_R2_Pin|ANALOG_GAMEPAD_L2_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_WritePin(ANALOG_GAMEPAD_R2_GPIO_Port,ANALOG_GAMEPAD_R2_Pin,1);
+	HAL_GPIO_WritePin(ANALOG_GAMEPAD_R2_GPIO_Port,ANALOG_GAMEPAD_L2_Pin,1);
+	HAL_GPIO_Init(ANALOG_GAMEPAD_R2_GPIO_Port, &GPIO_InitStruct);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -272,6 +296,18 @@ int main(void)
 						A=B=PC=0;
 						status = STAT_BACKKEY1;
 					}
+					if(KeyPressed & SCANCODE_BACKKEY2){
+						A=B=PC=0;
+						status = STAT_BACKKEY2;
+					}
+					if(KeyPressed & SCANCODE_BACKKEY3){
+						A=B=PC=0;
+						status = STAT_BACKKEY3;
+					}
+					if(KeyPressed & SCANCODE_BACKKEY4){
+						A=B=PC=0;
+						status = STAT_BACKKEY4;
+					}
 				}break;
 				case STAT_BACKKEY1:{
 					if(KeyReleased & SCANCODE_BACKKEY1){
@@ -279,6 +315,48 @@ int main(void)
 						status = STAT_IDLE;
 					}else {
 						Command_t cmd = ProgramSet.prog_BACKKEY1[PC];
+						switch(cmd.Operator){
+							case OP_PRESS:WriteKeyStat(cmd.Operand);break;
+							case OP_WAIT:PC--;B++;if(B>=cmd.Operand){PC++;B=0;}break;
+							case OP_JUMP:PC-=cmd.Operand;break;
+						}
+					}
+					PC++;
+				}break;
+				case STAT_BACKKEY2:{
+					if(KeyReleased & SCANCODE_BACKKEY2){
+						WriteKeyStat(0);
+						status = STAT_IDLE;
+					}else {
+						Command_t cmd = ProgramSet.prog_BACKKEY2[PC];
+						switch(cmd.Operator){
+							case OP_PRESS:WriteKeyStat(cmd.Operand);break;
+							case OP_WAIT:PC--;B++;if(B>=cmd.Operand){PC++;B=0;}break;
+							case OP_JUMP:PC-=cmd.Operand;break;
+						}
+					}
+					PC++;
+				}break;
+				case STAT_BACKKEY3:{
+					if(KeyReleased & SCANCODE_BACKKEY3){
+						WriteKeyStat(0);
+						status = STAT_IDLE;
+					}else {
+						Command_t cmd = ProgramSet.prog_BACKKEY3[PC];
+						switch(cmd.Operator){
+							case OP_PRESS:WriteKeyStat(cmd.Operand);break;
+							case OP_WAIT:PC--;B++;if(B>=cmd.Operand){PC++;B=0;}break;
+							case OP_JUMP:PC-=cmd.Operand;break;
+						}
+					}
+					PC++;
+				}break;
+				case STAT_BACKKEY4:{
+					if(KeyReleased & SCANCODE_BACKKEY4){
+						WriteKeyStat(0);
+						status = STAT_IDLE;
+					}else {
+						Command_t cmd = ProgramSet.prog_BACKKEY4[PC];
 						switch(cmd.Operator){
 							case OP_PRESS:WriteKeyStat(cmd.Operand);break;
 							case OP_WAIT:PC--;B++;if(B>=cmd.Operand){PC++;B=0;}break;
@@ -333,12 +411,103 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_USB;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
   PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+
+  /** Common config
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 4;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_6;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_71CYCLES_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_7;
+  sConfig.Rank = ADC_REGULAR_RANK_2;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_8;
+  sConfig.Rank = ADC_REGULAR_RANK_3;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_9;
+  sConfig.Rank = ADC_REGULAR_RANK_4;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+
 }
 
 /**
@@ -368,12 +537,12 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LED_A_PLUS_B_Pin|LED_FIST_Pin|LED_BULLET_Pin|LED_BULLET_A_Pin
-                          |LED_USB_Pin, GPIO_PIN_SET);
+                          |LED_USB_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PC13 PC14 PC15 */
   GPIO_InitStruct.Pin = GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : GPIO_GAMEPAD_TOUCH_Pin GPIO_GAMEPAD_R1_Pin GPIO_GAMEPAD_UP_Pin GPIO_GAMEPAD_LEFT_Pin
@@ -383,33 +552,32 @@ static void MX_GPIO_Init(void)
                           |GPIO_GAMEPAD_DOWN_Pin|GPIO_GAMEPAD_RIGHT_Pin|GPIO_GAMEPAD_SQUARE_Pin|GPIO_GAMEPAD_X_Pin
                           |GPIO_GAMEPAD_CIRCLE_Pin|GPIO_GAMEPAD_L1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PA6 PA7 */
-  GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  /*Configure GPIO pin : GPIO_GAMEPAD_TRIANGLE_Pin */
+  GPIO_InitStruct.Pin = GPIO_GAMEPAD_TRIANGLE_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIO_GAMEPAD_TRIANGLE_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB0 PB1 PB12 PB3
-                           BACKKEY1_Pin BACKKEY3_Pin BACKKEY2_Pin BACKKEY4_Pin
-                           BACKKEY_LEFT_Pin BACKKEY_RIGHT_Pin */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_12|GPIO_PIN_3
-                          |BACKKEY1_Pin|BACKKEY3_Pin|BACKKEY2_Pin|BACKKEY4_Pin
-                          |BACKKEY_LEFT_Pin|BACKKEY_RIGHT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  /*Configure GPIO pins : LED_A_PLUS_B_Pin LED_FIST_Pin LED_BULLET_Pin LED_BULLET_A_Pin
+                           LED_USB_Pin */
+  GPIO_InitStruct.Pin = LED_A_PLUS_B_Pin|LED_FIST_Pin|LED_BULLET_Pin|LED_BULLET_A_Pin
+                          |LED_USB_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : GPIO_GAMEPAD_TRIANGLE_Pin LED_A_PLUS_B_Pin LED_FIST_Pin LED_BULLET_Pin
-                           LED_BULLET_A_Pin LED_USB_Pin */
-  GPIO_InitStruct.Pin = GPIO_GAMEPAD_TRIANGLE_Pin|LED_A_PLUS_B_Pin|LED_FIST_Pin|LED_BULLET_Pin
-                          |LED_BULLET_A_Pin|LED_USB_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  /*Configure GPIO pins : PB12 PB3 BACKKEY1_Pin BACKKEY3_Pin
+                           BACKKEY2_Pin BACKKEY4_Pin BACKKEY_LEFT_Pin BACKKEY_RIGHT_Pin */
+  GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_3|BACKKEY1_Pin|BACKKEY3_Pin
+                          |BACKKEY2_Pin|BACKKEY4_Pin|BACKKEY_LEFT_Pin|BACKKEY_RIGHT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */

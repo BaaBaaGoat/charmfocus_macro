@@ -17,6 +17,8 @@
 "ps5modify\stm32f1xx_hal_flash.o"
 "ps5modify\stm32f1xx_hal_flash_ex.o"
 "ps5modify\stm32f1xx_hal_exti.o"
+"ps5modify\stm32f1xx_hal_adc.o"
+"ps5modify\stm32f1xx_hal_adc_ex.o"
 "ps5modify\stm32f1xx_hal_tim.o"
 "ps5modify\stm32f1xx_hal_tim_ex.o"
 "ps5modify\system_stm32f1xx.o"
